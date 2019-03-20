@@ -1,6 +1,5 @@
 package com.movsoft.aptracker.scenes.list
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -13,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.movsoft.aptracker.R
-import com.movsoft.aptracker.services.RafiServices
-import com.movsoft.aptracker.services.SharedPreferencesTrackedItemProvider
+import com.movsoft.aptracker.services.RafiTrackingServices
+import com.movsoft.aptracker.services.SharedPreferencesTrackedItemServices
 import kotlinx.android.synthetic.main.activity_main.*
 
 class TrackerListActivity : AppCompatActivity(), TrackerListViewModel.Listener {
@@ -33,9 +32,9 @@ class TrackerListActivity : AppCompatActivity(), TrackerListViewModel.Listener {
             showAddTrackedItemDialog()
         }
 
-        val trackingServices = RafiServices(this)
-        val trackedItemProvider = SharedPreferencesTrackedItemProvider()
-        viewModel = TrackerListViewModel(trackedItemProvider, trackingServices, trackedItemProvider, this)
+        val trackingServices = RafiTrackingServices(this)
+        val trackedItemProvider = SharedPreferencesTrackedItemServices(this)
+        viewModel = TrackerListViewModel(trackingServices, trackedItemProvider, this)
 
         val touchHelper = ItemTouchHelper(TrackerListAdapter.SwipeController())
         touchHelper.attachToRecyclerView(recyclerView)

@@ -14,14 +14,14 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
 import com.movsoft.aptracker.R
 
-class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(), Observer<List<TrackerItemViewModel>> {
+class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(), Observer<List<TrackedItemViewModel>> {
 
     class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
         var textView: TextView = view.findViewById(R.id.text_view)
         var bottomDivider: View = view.findViewById(R.id.bottom_divider)
     }
 
-    private var items = listOf<TrackerItemViewModel>()
+    private var items = listOf<TrackedItemViewModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val cell = LayoutInflater.from(parent.context).inflate(R.layout.cell_tracker_item, parent,false)
@@ -41,7 +41,7 @@ class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(),
         holder.bottomDivider.visibility = if (position == items.lastIndex) GONE else VISIBLE
     }
 
-    override fun onChanged(t: List<TrackerItemViewModel>?) {
+    override fun onChanged(t: List<TrackedItemViewModel>?) {
         items = t ?: listOf()
         notifyDataSetChanged()
     }
