@@ -3,20 +3,19 @@ package com.movsoft.aptracker.scenes.list
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager.LayoutParams.*
+import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.movsoft.aptracker.R
-import com.movsoft.aptracker.services.RafiTrackingServices
-import com.movsoft.aptracker.services.SharedPreferencesTrackedItemServices
+import com.movsoft.aptracker.scenes.APTrackerBaseActivity
+import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-class TrackerListActivity : AppCompatActivity(), TrackerListViewModel.Listener {
+class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener {
 
     lateinit var viewModel: TrackerListViewModel
 
@@ -32,9 +31,8 @@ class TrackerListActivity : AppCompatActivity(), TrackerListViewModel.Listener {
             showAddTrackedItemDialog()
         }
 
-        val trackingServices = RafiTrackingServices(this)
-        val trackedItemProvider = SharedPreferencesTrackedItemServices(this)
-        viewModel = TrackerListViewModel(trackingServices, trackedItemProvider, this)
+        viewModel = viewModelProvider.get(TrackerListViewModel::class.java)
+        viewModel.listener = this
 
         val touchHelper = ItemTouchHelper(TrackerListAdapter.SwipeController())
         touchHelper.attachToRecyclerView(recyclerView)
@@ -62,7 +60,11 @@ class TrackerListActivity : AppCompatActivity(), TrackerListViewModel.Listener {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                val settingsIntent = SettingsActivity.newIntent(this)
+                startActivity(settingsIntent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

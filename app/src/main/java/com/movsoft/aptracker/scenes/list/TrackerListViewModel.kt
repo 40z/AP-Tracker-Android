@@ -5,13 +5,14 @@ import androidx.lifecycle.ViewModel
 import com.movsoft.aptracker.services.TrackedItemServices
 import com.movsoft.aptracker.services.TrackingServices
 
-class TrackerListViewModel(val trackingServices: TrackingServices, val trackedItemServices: TrackedItemServices, val listener: Listener): ViewModel(), TrackedItemViewModel.Listener {
+class TrackerListViewModel(val trackingServices: TrackingServices, val trackedItemServices: TrackedItemServices): ViewModel(), TrackedItemViewModel.Listener {
 
     interface Listener {
         fun showMessage(message: String)
         fun showError(message: String)
     }
 
+    var listener: Listener? = null
     val trackedItems: MutableLiveData<List<TrackedItemViewModel>> = MutableLiveData()
 
     fun refresh() {
@@ -28,8 +29,8 @@ class TrackerListViewModel(val trackingServices: TrackingServices, val trackedIt
 
     override fun onTrackedItemSelected(item: TrackedItemViewModel) {
         trackingServices.track(item.itemNameText) { result ->
-            if (result.isSuccess) listener.showMessage("Started tracking ${item.itemNameText}")
-            else listener.showError("Error tracking ${item.itemNameText}")
+            if (result.isSuccess) listener?.showMessage("Started tracking ${item.itemNameText}")
+            else listener?.showError("Error tracking ${item.itemNameText}")
         }
     }
 }

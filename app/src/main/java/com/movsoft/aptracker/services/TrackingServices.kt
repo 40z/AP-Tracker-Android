@@ -6,6 +6,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
+import java.lang.Error
 
 typealias TrackItemCompletion = (result: Result<Boolean>) -> Unit
 
@@ -26,15 +27,23 @@ class DummyTrackingServices: TrackingServices {
 /**
  * Implementation of TrackingServices that tracks items with RafiBot.
  */
-class RafiTrackingServices(context: Context): TrackingServices {
+class RafiTrackingServices(context: Context, private val settingsServices: SettingsServices): TrackingServices {
 
     private val queue = Volley.newRequestQueue(context)
 
     override fun track(item: String, completion: TrackItemCompletion) {
-        val url = "http://68.49.121.20:8090/hubot/aptracker/tracking"
+        val settings = settingsServices.getSettings()
+
+        if (!settings.isValid()) {
+            val error = Error("Settings not valid")
+            completion(Result.failure(error))
+            return
+        }
+
+        val url = "${settings.server}/hubot/aptracker/${settings.trackingChannel}"
         val jsonBody = JSONObject()
-        jsonBody.put("user", "mov1s")
-        jsonBody.put("trackeditem", "test")
+        jsonBody.put("user", settings.userName)
+        jsonBody.put("trackeditem", item)
         jsonBody.put("action", "SINGLE")
 
         val request = object : StringRequest(Request.Method.POST, url, Response.Listener<String> {
