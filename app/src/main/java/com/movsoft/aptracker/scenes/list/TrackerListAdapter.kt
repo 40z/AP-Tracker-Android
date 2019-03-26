@@ -1,20 +1,25 @@
 package com.movsoft.aptracker.scenes.list
 
-import android.graphics.Canvas
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.movsoft.aptracker.R
 
-class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(), Observer<List<TrackedItemViewModel>> {
+@BindingAdapter("tracked_items")
+fun RecyclerView.setTrackedItems(items: List<TrackedItemViewModel>) {
+    val adapter = adapter
+    if (adapter is TrackerListAdapter) {
+        adapter.refresh(items)
+        adapter.notifyDataSetChanged()
+    }
+}
+
+class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
     class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
         var textView: TextView = view.findViewById(R.id.text_view)
@@ -41,47 +46,8 @@ class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>(),
         holder.bottomDivider.visibility = if (position == items.lastIndex) GONE else VISIBLE
     }
 
-    override fun onChanged(t: List<TrackedItemViewModel>?) {
-        items = t ?: listOf()
+    fun refresh(trackedItems: List<TrackedItemViewModel>) {
+        items = trackedItems
         notifyDataSetChanged()
-    }
-
-    class SwipeController: ItemTouchHelper.Callback() {
-        private var swipeBack = false
-
-        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            return makeMovementFlags(0, LEFT or RIGHT)
-        }
-
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            return false
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            //TODO
-        }
-
-        override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
-            if (swipeBack) {
-                swipeBack = false
-                return 0
-            }
-
-            return super.convertToAbsoluteDirection(flags, layoutDirection)
-        }
-
-        override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-            if (actionState == ACTION_STATE_SWIPE) {
-                setTouchListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            }
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-        }
-
-        private fun setTouchListener(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dy: Float, actionState: Int, isCurrentlylActive: Boolean) {
-            recyclerView.setOnTouchListener { view, motionEvent ->
-                swipeBack = motionEvent.action == MotionEvent.ACTION_CANCEL || motionEvent.action == MotionEvent.ACTION_UP
-                return@setOnTouchListener false
-            }
-        }
     }
 }

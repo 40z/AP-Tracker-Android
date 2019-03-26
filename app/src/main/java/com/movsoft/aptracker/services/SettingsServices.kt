@@ -27,7 +27,7 @@ class SharedPreferencesSettingsServices(context: Context): SettingsServices {
     }
 
     override fun getSettings(): Settings {
-        val json = sharedPrefs.getString("savedSettings", "{}")
+        val json = sharedPrefs.getString("savedSettings", "{ \"trackingChannel\":\"tracking\" }")
         return GsonBuilder().create().fromJson(json, Settings::class.java)
     }
 }

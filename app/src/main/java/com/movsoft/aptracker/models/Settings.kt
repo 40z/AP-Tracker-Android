@@ -10,6 +10,6 @@ data class Settings(var userName: String?, var server: String?, var trackingChan
      * Valid settings needs to have all properties non-null.
      */
     fun isValid(): Boolean {
-        return userName != null && server != null && trackingChannel != null
+        return !userName.isNullOrEmpty() && !server.isNullOrEmpty() && !trackingChannel.isNullOrEmpty()
     }
 }

@@ -5,10 +5,11 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.movsoft.aptracker.models.TrackItemResult
 import org.json.JSONObject
 import java.lang.Error
 
-typealias TrackItemCompletion = (result: Result<Boolean>) -> Unit
+typealias TrackItemCompletion = (result: Result<TrackItemResult.Status>) -> Unit
 
 /**
  * Services that provide tracking functionality.
@@ -47,7 +48,7 @@ class RafiTrackingServices(context: Context, private val settingsServices: Setti
         jsonBody.put("action", "SINGLE")
 
         val request = object : StringRequest(Request.Method.POST, url, Response.Listener<String> {
-            completion(Result.success(true))
+            completion(Result.success(TrackItemResult.Status.STARTED))
         }, Response.ErrorListener {
             completion(Result.failure(it))
         }) {

@@ -3,45 +3,54 @@ package com.movsoft.aptracker.scenes.list
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.movsoft.aptracker.R
-import com.movsoft.aptracker.scenes.APTrackerBaseActivity
+import com.movsoft.aptracker.databinding.ActivityMainBinding
+import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
+import com.movsoft.aptracker.scenes.base.ViewModelState
+import com.movsoft.aptracker.scenes.base.ViewModelState.Complete
+import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
+import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.SettingsNotValid
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener {
+interface TrackerListActionHandler {
+    fun onSettingsTapped(view: View)
+    fun onAddItemTapped(view: View)
+}
 
-    lateinit var viewModel: TrackerListViewModel
+class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
 
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: TrackerListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(toolbar)
-        recyclerView = findViewById(R.id.tracker_list)
-
-        fab.setOnClickListener { view ->
-            showAddTrackedItemDialog()
-        }
 
         viewModel = viewModelProvider.get(TrackerListViewModel::class.java)
         viewModel.listener = this
 
-        val touchHelper = ItemTouchHelper(TrackerListAdapter.SwipeController())
-        touchHelper.attachToRecyclerView(recyclerView)
+//        val touchHelper = ItemTouchHelper(TrackerListAdapter.SwipeController())
+//        touchHelper.attachToRecyclerView(binding.trackerList)
 
-        val adapter = TrackerListAdapter()
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.trackerList.adapter = TrackerListAdapter()
+        binding.trackerList.layoutManager = LinearLayoutManager(this)
 
-        viewModel.trackedItems.observe(this, adapter)
+        viewModel.state.observe(this, Observer { transitionToState(it) })
+
+        binding.viewModel = viewModel
+        binding.handler = this
     }
 
     override fun onResume() {
@@ -50,43 +59,51 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> {
-                val settingsIntent = SettingsActivity.newIntent(this)
-                startActivity(settingsIntent)
+                onSettingsTapped(binding.trackerList)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-
+    //------------------------------------------------------------------------------------------------------------------
     // TrackerListViewModel.Listener Conformance
-
+    //------------------------------------------------------------------------------------------------------------------
 
     override fun showMessage(message: String) {
-        Snackbar.make(recyclerView, message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(binding.trackerList, message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun showError(message: String) {
-        val snackbar = Snackbar.make(recyclerView, message, Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(binding.trackerList, message, Snackbar.LENGTH_LONG)
         val redColor = resources.getColor(android.R.color.holo_red_dark)
         snackbar.view.setBackgroundColor(redColor)
         snackbar.show()
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // TrackerListActionHandler Conformance
+    //------------------------------------------------------------------------------------------------------------------
 
+    override fun onSettingsTapped(view: View) {
+        val settingsIntent = SettingsActivity.newIntent(this)
+        startActivity(settingsIntent)
+    }
+
+    override fun onAddItemTapped(view: View) {
+        showAddTrackedItemDialog()
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
     // UI
-
+    //------------------------------------------------------------------------------------------------------------------
 
     private fun showAddTrackedItemDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_new_trackable, null)
@@ -102,5 +119,11 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         }
         dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") {_, _-> }
         dialog.show()
+    }
+
+    private fun transitionToState(state: ViewModelState) {
+        val showSettingsPlaceholder = state is Placeholder && state.type == SettingsNotValid
+        binding.fab.visibility = if (state is Complete) VISIBLE else GONE
+        binding.settingsPlaceholderContainer.visibility = if (showSettingsPlaceholder) VISIBLE else GONE
     }
 }

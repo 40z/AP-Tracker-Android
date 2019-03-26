@@ -25,7 +25,7 @@ class APTrackerApplication: Application(), ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when (modelClass) {
             SettingsViewModel::class.java -> SettingsViewModel(settingsServices) as T
-            TrackerListViewModel::class.java -> TrackerListViewModel(trackingServices, trackedItemServices) as T
+            TrackerListViewModel::class.java -> TrackerListViewModel(trackingServices, trackedItemServices, settingsServices) as T
             else -> modelClass.newInstance()
         }
     }

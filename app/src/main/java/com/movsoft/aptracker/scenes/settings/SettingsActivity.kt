@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivitySettingsBinding
-import com.movsoft.aptracker.scenes.APTrackerBaseActivity
+import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
 import kotlinx.android.synthetic.main.activity_settings.*
 
 /**

@@ -1,4 +1,4 @@
-package com.movsoft.aptracker.scenes
+package com.movsoft.aptracker.scenes.base
 
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
