@@ -4,10 +4,10 @@ package com.movsoft.aptracker.scenes.base
  * Different states a view model may transition through.
  */
 sealed class ViewModelState {
-    class NotStarted: ViewModelState()
-    class Loading: ViewModelState()
+    object NotStarted : ViewModelState()
+    object Loading : ViewModelState()
     class Placeholder(val type: ViewModelStatePlaceholder): ViewModelState()
-    class Complete: ViewModelState()
+    object Complete : ViewModelState()
 }
 
 /**

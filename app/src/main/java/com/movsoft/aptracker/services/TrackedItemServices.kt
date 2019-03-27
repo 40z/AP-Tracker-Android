@@ -13,6 +13,7 @@ typealias GetTrackedItemsCompletion = (result: Result<List<TrackedItem>>) -> Uni
 interface TrackedItemServices {
     fun getTrackedItems(completion: GetTrackedItemsCompletion)
     fun addTrackedItem(itemName: String)
+    fun deleteTrackedItem(itemName: String)
 }
 
 /**
@@ -34,6 +35,11 @@ class SharedPreferencesTrackedItemServices(context: Context): TrackedItemService
 
     override fun addTrackedItem(itemName: String) {
         items.add(TrackedItem(itemName))
+        persist(items)
+    }
+
+    override fun deleteTrackedItem(itemName: String) {
+        items.remove(TrackedItem(itemName))
         persist(items)
     }
 

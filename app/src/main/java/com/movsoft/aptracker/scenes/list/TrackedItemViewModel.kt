@@ -6,6 +6,7 @@ class TrackedItemViewModel(trackedItem: TrackedItem, val listener: Listener) {
 
     interface Listener {
         fun onTrackedItemSelected(item: TrackedItemViewModel)
+        fun onTrackedItemDeleted(item: TrackedItemViewModel)
     }
 
     val itemNameText: String
@@ -16,5 +17,9 @@ class TrackedItemViewModel(trackedItem: TrackedItem, val listener: Listener) {
 
     fun onTap() {
         listener.onTrackedItemSelected(this)
+    }
+
+    fun onDelete() {
+        listener.onTrackedItemDeleted(this)
     }
 }

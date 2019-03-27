@@ -1,11 +1,9 @@
 package com.movsoft.aptracker.scenes.list
 
-import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.movsoft.aptracker.BR
 import com.movsoft.aptracker.models.TrackItemResult
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.*
@@ -30,12 +28,7 @@ class TrackerListViewModel(
 
     var state: MutableLiveData<ViewModelState> = MutableLiveData()
 
-    @Bindable
-    var trackedItems: List<TrackedItemViewModel> = listOf()
-        private set(value) {
-            field = value
-            callbacks.notifyChange(this, BR.trackedItems)
-        }
+    var trackedItems: MutableLiveData<List<TrackedItemViewModel>> = MutableLiveData()
 
     private val callbacks: PropertyChangeRegistry = PropertyChangeRegistry()
 
@@ -47,11 +40,11 @@ class TrackerListViewModel(
         }
 
         //Fetch list of tracked items
-        state.value = Loading()
+        state.value = Loading
         trackedItemServices.getTrackedItems { result ->
             val fetchedItems = result.getOrDefault(listOf())
-            trackedItems = fetchedItems.map { TrackedItemViewModel(it, this) }
-            state.value = if (fetchedItems.isEmpty()) Placeholder(NoContent) else Complete()
+            trackedItems.value = fetchedItems.map { TrackedItemViewModel(it, this) }
+            state.value = if (fetchedItems.isEmpty()) Placeholder(NoContent) else Complete
         }
     }
 
@@ -73,6 +66,11 @@ class TrackerListViewModel(
                 listener?.showMessage("$startStop tracking ${item.itemNameText}")
             }
         }
+    }
+
+    override fun onTrackedItemDeleted(item: TrackedItemViewModel) {
+        trackedItemServices.deleteTrackedItem(item.itemNameText)
+        refresh()
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,6 @@ import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivityMainBinding
 import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
 import com.movsoft.aptracker.scenes.base.ViewModelState
-import com.movsoft.aptracker.scenes.base.ViewModelState.Complete
 import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.SettingsNotValid
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
@@ -41,14 +40,12 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         viewModel = viewModelProvider.get(TrackerListViewModel::class.java)
         viewModel.listener = this
 
-//        val touchHelper = ItemTouchHelper(TrackerListAdapter.SwipeController())
-//        touchHelper.attachToRecyclerView(binding.trackerList)
-
         binding.trackerList.adapter = TrackerListAdapter()
         binding.trackerList.layoutManager = LinearLayoutManager(this)
 
         viewModel.state.observe(this, Observer { transitionToState(it) })
 
+        binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.handler = this
     }
@@ -123,7 +120,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
 
     private fun transitionToState(state: ViewModelState) {
         val showSettingsPlaceholder = state is Placeholder && state.type == SettingsNotValid
-        binding.fab.visibility = if (state is Complete) VISIBLE else GONE
+        binding.fab.visibility = if (!showSettingsPlaceholder) VISIBLE else GONE
         binding.settingsPlaceholderContainer.visibility = if (showSettingsPlaceholder) VISIBLE else GONE
     }
 }
