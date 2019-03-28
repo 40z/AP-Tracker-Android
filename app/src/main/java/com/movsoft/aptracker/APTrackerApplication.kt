@@ -22,6 +22,7 @@ class APTrackerApplication: Application(), ViewModelProvider.Factory {
         trackedItemServices = SharedPreferencesTrackedItemServices(this)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when (modelClass) {
             SettingsViewModel::class.java -> SettingsViewModel(settingsServices) as T

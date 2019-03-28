@@ -5,6 +5,7 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.movsoft.aptracker.models.TrackItemResult
+import com.movsoft.aptracker.models.TrackItemResult.Status.STARTED
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.*
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.NoContent
@@ -61,8 +62,8 @@ class TrackerListViewModel(
         trackingServices.track(item.itemNameText) { result ->
             if (result.isFailure) listener?.showError("Error tracking ${item.itemNameText}")
             else {
-                val trackingResult = result.getOrDefault(TrackItemResult.Status.STARTED)
-                val startStop = if (trackingResult == TrackItemResult.Status.STARTED) "Started" else "Stopped"
+                val trackingResult = result.getOrDefault(TrackItemResult(STARTED))
+                val startStop = if (trackingResult.status == STARTED) "Started" else "Stopped"
                 listener?.showMessage("$startStop tracking ${item.itemNameText}")
             }
         }

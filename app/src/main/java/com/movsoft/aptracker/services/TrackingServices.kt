@@ -5,11 +5,11 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.GsonBuilder
 import com.movsoft.aptracker.models.TrackItemResult
 import org.json.JSONObject
-import java.lang.Error
 
-typealias TrackItemCompletion = (result: Result<TrackItemResult.Status>) -> Unit
+typealias TrackItemCompletion = (result: Result<TrackItemResult>) -> Unit
 
 /**
  * Services that provide tracking functionality.
@@ -34,6 +34,16 @@ class RafiTrackingServices(context: Context, private val settingsServices: Setti
 
     override fun track(item: String, completion: TrackItemCompletion) {
         val settings = settingsServices.getSettings()
+        val path = "/hubot/aptracker/${settings.trackingChannel}"
+        val jsonBody = JSONObject()
+        jsonBody.put("user", settings.userName)
+        jsonBody.put("trackeditem", item)
+        jsonBody.put("action", "SINGLE")
+        makeRequest(path, jsonBody, TrackItemResult::class.java, completion)
+    }
+
+    private fun <T> makeRequest(path: String, postBody: JSONObject, resultClass: Class<T>, completion: (result: Result<T>) -> Unit) {
+        val settings = settingsServices.getSettings()
 
         if (!settings.isValid()) {
             val error = Error("Settings not valid")
@@ -41,14 +51,11 @@ class RafiTrackingServices(context: Context, private val settingsServices: Setti
             return
         }
 
-        val url = "${settings.server}/hubot/aptracker/${settings.trackingChannel}"
-        val jsonBody = JSONObject()
-        jsonBody.put("user", settings.userName)
-        jsonBody.put("trackeditem", item)
-        jsonBody.put("action", "SINGLE")
+        val url = "${settings.server}${path}"
 
         val request = object : StringRequest(Request.Method.POST, url, Response.Listener<String> {
-            completion(Result.success(TrackItemResult.Status.STARTED))
+            val result = GsonBuilder().create().fromJson(it, resultClass)
+            completion(Result.success(result))
         }, Response.ErrorListener {
             completion(Result.failure(it))
         }) {
@@ -57,7 +64,7 @@ class RafiTrackingServices(context: Context, private val settingsServices: Setti
             }
 
             override fun getBody(): ByteArray {
-                return jsonBody.toString().toByteArray(Charsets.UTF_8)
+                return postBody.toString().toByteArray(Charsets.UTF_8)
             }
         }
 

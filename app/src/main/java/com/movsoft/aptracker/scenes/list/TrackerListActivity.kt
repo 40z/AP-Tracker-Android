@@ -1,6 +1,7 @@
 package com.movsoft.aptracker.scenes.list
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -22,7 +24,7 @@ import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.SettingsNotVa
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-interface TrackerListActionHandler {
+interface TrackerListActionHandler: TextView.OnEditorActionListener {
     fun onSettingsTapped(view: View)
     fun onAddItemTapped(view: View)
 }
@@ -30,6 +32,7 @@ interface TrackerListActionHandler {
 class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
 
     private lateinit var binding: ActivityMainBinding
+    private var dialog: AlertDialog? = null
     private lateinit var viewModel: TrackerListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +101,11 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         showAddTrackedItemDialog()
     }
 
+    override fun onEditorAction(p0: TextView?, p1: Int, p2: KeyEvent?): Boolean {
+        dialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick()
+        return true
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // UI
     //------------------------------------------------------------------------------------------------------------------
@@ -105,17 +113,18 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     private fun showAddTrackedItemDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_new_trackable, null)
         val dialogEditText = dialogView.findViewById<EditText>(R.id.edit_text)
+        dialogEditText.setOnEditorActionListener(this)
         dialogEditText.requestFocus()
 
-        val dialog = AlertDialog.Builder(this).create()
-        dialog.setTitle("Add New Tracked Item")
-        dialog.setView(dialogView)
-        dialog.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Add") { _, _ ->
+        dialog = AlertDialog.Builder(this).create()
+        dialog!!.setTitle("Add New Tracked Item")
+        dialog!!.setView(dialogView)
+        dialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialog!!.setButton(AlertDialog.BUTTON_POSITIVE, "Add") { _, _ ->
             viewModel.addItem(dialogEditText.text.toString())
         }
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") {_, _-> }
-        dialog.show()
+        dialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") {_, _-> }
+        dialog!!.show()
     }
 
     private fun transitionToState(state: ViewModelState) {

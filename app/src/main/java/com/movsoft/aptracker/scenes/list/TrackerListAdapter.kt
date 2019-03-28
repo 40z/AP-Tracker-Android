@@ -4,20 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.movsoft.aptracker.R
-
-@BindingAdapter("tracked_items")
-fun RecyclerView.setTrackedItems(items: LiveData<List<TrackedItemViewModel>>) {
-    val adapter = adapter
-    if (adapter is TrackerListAdapter) {
-        adapter.refresh(items.value ?: listOf())
-    }
-}
 
 class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
