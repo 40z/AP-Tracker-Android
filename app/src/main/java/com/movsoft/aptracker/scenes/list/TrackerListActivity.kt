@@ -117,13 +117,13 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         dialogEditText.requestFocus()
 
         dialog = AlertDialog.Builder(this).create()
-        dialog!!.setTitle("Add New Tracked Item")
+        dialog!!.setTitle(getString(R.string.add_new_item))
         dialog!!.setView(dialogView)
         dialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog!!.setButton(AlertDialog.BUTTON_POSITIVE, "Add") { _, _ ->
+        dialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.add)) { _, _ ->
             viewModel.addItem(dialogEditText.text.toString())
         }
-        dialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") {_, _-> }
+        dialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _-> }
         dialog!!.show()
     }
 
