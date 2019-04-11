@@ -22,7 +22,9 @@ interface TrackingServices {
  * Implementation of TrackingServices that does nothing.
  */
 class DummyTrackingServices: TrackingServices {
-    override fun track(item: String, completion: TrackItemCompletion) {}
+    override fun track(item: String, completion: TrackItemCompletion) {
+        completion(Result.success(TrackItemResult(TrackItemResult.Status.STARTED)))
+    }
 }
 
 /**

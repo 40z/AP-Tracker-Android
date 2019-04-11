@@ -14,9 +14,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivityMainBinding
+import com.movsoft.aptracker.databinding.DialogTrackableOptionsBottomSheetBinding
 import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
@@ -27,12 +29,16 @@ import kotlinx.android.synthetic.main.activity_main.*
 interface TrackerListActionHandler: TextView.OnEditorActionListener {
     fun onSettingsTapped(view: View)
     fun onAddItemTapped(view: View)
+    fun onDeleteItemTapped(identifier: String)
+    fun onOptionsForItemTapped(identifier: String)
+    fun onItemTapped(identifier: String)
 }
 
 class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
 
     private lateinit var binding: ActivityMainBinding
-    private var dialog: AlertDialog? = null
+    private var addItemDialog: AlertDialog? = null
+    private var itemOptionsDialog: BottomSheetDialog? = null
     private lateinit var viewModel: TrackerListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +49,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         viewModel = viewModelProvider.get(TrackerListViewModel::class.java)
         viewModel.listener = this
 
-        binding.trackerList.adapter = TrackerListAdapter()
+        binding.trackerList.adapter = TrackerListAdapter(this)
         binding.trackerList.layoutManager = LinearLayoutManager(this)
 
         viewModel.state.observe(this, Observer { transitionToState(it) })
@@ -101,8 +107,25 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         showAddTrackedItemDialog()
     }
 
+    override fun onDeleteItemTapped(identifier: String) {
+        viewModel.deleteItem(identifier)
+        itemOptionsDialog?.dismiss()
+    }
+
+    override fun onOptionsForItemTapped(identifier: String) {
+        showOptionsDialog(identifier)
+    }
+
+    override fun onItemTapped(identifier: String) {
+        viewModel.trackItem(identifier)
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // OnEditorActionListene Conformance
+    //------------------------------------------------------------------------------------------------------------------
+
     override fun onEditorAction(p0: TextView?, p1: Int, p2: KeyEvent?): Boolean {
-        dialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick()
+        addItemDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick()
         return true
     }
 
@@ -110,21 +133,30 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     // UI
     //------------------------------------------------------------------------------------------------------------------
 
+    private fun showOptionsDialog(identifier: String) {
+        itemOptionsDialog = BottomSheetDialog(this)
+        val binding = DataBindingUtil.inflate<DialogTrackableOptionsBottomSheetBinding>(layoutInflater, R.layout.dialog_trackable_options_bottom_sheet, binding.trackerList, false)
+        binding.handler = this
+        binding.trackedItemIdentifier = identifier
+        itemOptionsDialog!!.setContentView(binding.root)
+        itemOptionsDialog!!.show()
+    }
+
     private fun showAddTrackedItemDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_new_trackable, null)
         val dialogEditText = dialogView.findViewById<EditText>(R.id.edit_text)
         dialogEditText.setOnEditorActionListener(this)
         dialogEditText.requestFocus()
 
-        dialog = AlertDialog.Builder(this).create()
-        dialog!!.setTitle(getString(R.string.add_new_item))
-        dialog!!.setView(dialogView)
-        dialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        dialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.add)) { _, _ ->
+        addItemDialog = AlertDialog.Builder(this).create()
+        addItemDialog!!.setTitle(getString(R.string.add_new_item))
+        addItemDialog!!.setView(dialogView)
+        addItemDialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        addItemDialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.add)) { _, _ ->
             viewModel.addItem(dialogEditText.text.toString())
         }
-        dialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _-> }
-        dialog!!.show()
+        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _-> }
+        addItemDialog!!.show()
     }
 
     private fun transitionToState(state: ViewModelState) {

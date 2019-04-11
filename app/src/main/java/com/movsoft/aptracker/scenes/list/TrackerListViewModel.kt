@@ -18,7 +18,7 @@ class TrackerListViewModel(
     private val trackingServices: TrackingServices,
     private val trackedItemServices: TrackedItemServices,
     private val settingsServices: SettingsServices
-): ViewModel(), TrackedItemViewModel.Listener, Observable {
+): ViewModel(), Observable {
 
     interface Listener {
         fun showMessage(message: String)
@@ -44,34 +44,31 @@ class TrackerListViewModel(
         state.value = Loading
         trackedItemServices.getTrackedItems { result ->
             val fetchedItems = result.getOrDefault(listOf())
-            trackedItems.value = fetchedItems.map { TrackedItemViewModel(it, this) }
+            trackedItems.value = fetchedItems.map { TrackedItemViewModel(it) }
             state.value = if (fetchedItems.isEmpty()) Placeholder(NoContent) else Complete
         }
     }
 
-    fun addItem(item: String) {
-        trackedItemServices.addTrackedItem(item)
+    fun addItem(itemName: String) {
+        trackedItemServices.addTrackedItem(itemName)
         refresh()
     }
 
-    //------------------------------------------------------------------------------------------------------------------
-    // TrackedItemViewModel.Listener Conformance
-    //------------------------------------------------------------------------------------------------------------------
+    fun deleteItem(itemIdentifier: String) {
+        trackedItemServices.deleteTrackedItem(itemIdentifier)
+        refresh()
+    }
 
-    override fun onTrackedItemSelected(item: TrackedItemViewModel) {
-        trackingServices.track(item.itemNameText) { result ->
-            if (result.isFailure) listener?.showError("Error tracking ${item.itemNameText}")
+    fun trackItem(itemIdentifier: String) {
+        val item = trackedItems.value?.first { it.itemIdentifier == itemIdentifier }
+        trackingServices.track(itemIdentifier) { result ->
+            if (result.isFailure) listener?.showError("Error tracking ${item?.itemNameText}")
             else {
                 val trackingResult = result.getOrDefault(TrackItemResult(STARTED))
                 val startStop = if (trackingResult.status == STARTED) "Started" else "Stopped"
-                listener?.showMessage("$startStop tracking ${item.itemNameText}")
+                listener?.showMessage("$startStop tracking ${item?.itemNameText}")
             }
         }
-    }
-
-    override fun onTrackedItemDeleted(item: TrackedItemViewModel) {
-        trackedItemServices.deleteTrackedItem(item.itemNameText)
-        refresh()
     }
 
     //------------------------------------------------------------------------------------------------------------------
