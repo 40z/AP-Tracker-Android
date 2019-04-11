@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.movsoft.aptracker.R
@@ -30,7 +31,8 @@ interface TrackerListActionHandler: TextView.OnEditorActionListener {
     fun onSettingsTapped(view: View)
     fun onAddItemTapped(view: View)
     fun onDeleteItemTapped(identifier: String)
-    fun onOptionsForItemTapped(identifier: String)
+    fun onOptionsForItemTapped(identifier: String, cell: SwipeRevealLayout)
+    fun onAverageForItemTapped(identifier: String, cell: SwipeRevealLayout)
     fun onItemTapped(identifier: String)
 }
 
@@ -112,8 +114,14 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         itemOptionsDialog?.dismiss()
     }
 
-    override fun onOptionsForItemTapped(identifier: String) {
+    override fun onOptionsForItemTapped(identifier: String, cell: SwipeRevealLayout) {
+        cell.close(true)
         showOptionsDialog(identifier)
+    }
+
+    override fun onAverageForItemTapped(identifier: String, cell: SwipeRevealLayout) {
+        cell.close(true)
+        viewModel.trackAverageItem(identifier)
     }
 
     override fun onItemTapped(identifier: String) {

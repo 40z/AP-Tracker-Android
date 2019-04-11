@@ -71,6 +71,16 @@ class TrackerListViewModel(
         }
     }
 
+    fun trackAverageItem(itemIdentifier: String) {
+        val item = trackedItems.value?.first { it.itemIdentifier == itemIdentifier }
+        trackingServices.trackAverage(itemIdentifier) { result ->
+            if (result.isFailure) listener?.showError("Error tracking ${item?.itemNameText}")
+            else {
+                listener?.showMessage("Tracked average ${item?.itemNameText}")
+            }
+        }
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Observable Conformance
     //------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
@@ -29,14 +28,28 @@ xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="80dp"
+                android:layout_width="@dimen/cell_menu_item_width"
                 android:layout_height="match_parent"
                 android:background="?android:colorControlHighlight"
                 android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:onClick="@{ () -> handler.onAverageForItemTapped(viewModel.itemIdentifier, swipeReveal) }"
+                android:scaleType="center"
+                android:src="@drawable/ic_average"
+                android:tint="@android:color/white" />
+
+            <ImageView
+                android:layout_width="@dimen/cell_menu_item_width"
+                android:layout_height="match_parent"
+                android:background="?android:colorControlHighlight"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:onClick="@{ () -> handler.onOptionsForItemTapped(viewModel.itemIdentifier, swipeReveal) }"
                 android:scaleType="center"
                 android:src="@drawable/ic_more"
-                android:tint="@android:color/white"
-                android:onClick="@{ () -> handler.onOptionsForItemTapped(viewModel.itemIdentifier) }"/>
+                android:tint="@android:color/white" />
 
         </LinearLayout>
 
@@ -44,8 +57,8 @@ xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/clickable_white"
-            android:orientation="vertical"
-            android:onClick="@{ () -> handler.onItemTapped(viewModel.itemIdentifier) }">
+            android:onClick="@{ () -> handler.onItemTapped(viewModel.itemIdentifier) }"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -54,8 +67,8 @@ xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
-                android:textSize="20sp"
-                android:text="@{ viewModel.itemNameText }"/>
+                android:text="@{ viewModel.itemNameText }"
+                android:textSize="20sp" />
 
         </LinearLayout>
 
