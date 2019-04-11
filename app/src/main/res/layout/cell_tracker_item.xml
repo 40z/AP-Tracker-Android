@@ -1,47 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:elevation="5dp"
-    app:dragEdge="left">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
-        android:orientation="horizontal">
+    <data>
 
-        <ImageView
-            android:id="@+id/delete_button"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:background="?android:colorControlHighlight"
-            android:clickable="true"
-            android:scaleType="center"
-            android:src="@drawable/ic_delete"
-            android:tint="@android:color/white" />
+        <variable
+            name="handler"
+            type="com.movsoft.aptracker.scenes.list.TrackerListActionHandler" />
 
-    </LinearLayout>
+        <variable
+            name="viewModel"
+            type="com.movsoft.aptracker.scenes.list.TrackedItemViewModel" />
+    </data>
 
-    <LinearLayout
-        android:id="@+id/cell"
+    <com.chauthai.swipereveallayout.SwipeRevealLayout
+        android:id="@+id/swipe_reveal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/clickable_white"
-        android:orientation="vertical">
+        android:background="@android:color/white"
+        android:elevation="5dp"
+        app:dragEdge="right">
 
-        <TextView
-            android:id="@+id/text_view"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/cell_menu_item_width"
+                android:layout_height="match_parent"
+                android:background="?android:colorControlHighlight"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:onClick="@{ () -> handler.onAverageForItemTapped(viewModel.itemIdentifier, swipeReveal) }"
+                android:scaleType="center"
+                android:src="@drawable/ic_average"
+                android:tint="@android:color/white" />
+
+            <ImageView
+                android:layout_width="@dimen/cell_menu_item_width"
+                android:layout_height="match_parent"
+                android:background="?android:colorControlHighlight"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:onClick="@{ () -> handler.onOptionsForItemTapped(viewModel.itemIdentifier, swipeReveal) }"
+                android:scaleType="center"
+                android:src="@drawable/ic_more"
+                android:tint="@android:color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:textSize="20sp" />
+            android:background="@drawable/clickable_white"
+            android:onClick="@{ () -> handler.onItemTapped(viewModel.itemIdentifier) }"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:text="@{ viewModel.itemNameText }"
+                android:textSize="20sp" />
 
-</com.chauthai.swipereveallayout.SwipeRevealLayout>
+        </LinearLayout>
+
+    </com.chauthai.swipereveallayout.SwipeRevealLayout>
+
+</layout>

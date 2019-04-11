@@ -16,13 +16,20 @@ typealias TrackItemCompletion = (result: Result<TrackItemResult>) -> Unit
  */
 interface TrackingServices {
     fun track(item: String, completion: TrackItemCompletion)
+    fun trackAverage(item: String, completion: TrackItemCompletion)
 }
 
 /**
  * Implementation of TrackingServices that does nothing.
  */
 class DummyTrackingServices: TrackingServices {
-    override fun track(item: String, completion: TrackItemCompletion) {}
+    override fun track(item: String, completion: TrackItemCompletion) {
+        completion(Result.success(TrackItemResult(TrackItemResult.Status.STARTED)))
+    }
+
+    override fun trackAverage(item: String, completion: TrackItemCompletion) {
+        completion(Result.success(TrackItemResult(TrackItemResult.Status.STARTED)))
+    }
 }
 
 /**
@@ -39,6 +46,16 @@ class RafiTrackingServices(context: Context, private val settingsServices: Setti
         jsonBody.put("user", settings.userName)
         jsonBody.put("trackeditem", item)
         jsonBody.put("action", "SINGLE")
+        makeRequest(path, jsonBody, TrackItemResult::class.java, completion)
+    }
+
+    override fun trackAverage(item: String, completion: TrackItemCompletion) {
+        val settings = settingsServices.getSettings()
+        val path = "/hubot/aptracker/${settings.trackingChannel}"
+        val jsonBody = JSONObject()
+        jsonBody.put("user", settings.userName)
+        jsonBody.put("trackeditem", item)
+        jsonBody.put("action", "AVERAGE")
         makeRequest(path, jsonBody, TrackItemResult::class.java, completion)
     }
 
