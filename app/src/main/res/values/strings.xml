@@ -9,4 +9,5 @@
     <string name="add_new_item">Add New Tracked Item</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
 </resources>

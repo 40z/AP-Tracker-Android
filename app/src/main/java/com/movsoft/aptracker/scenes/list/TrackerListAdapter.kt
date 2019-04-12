@@ -1,29 +1,23 @@
 package com.movsoft.aptracker.scenes.list
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.movsoft.aptracker.R
+import com.movsoft.aptracker.databinding.CellTrackerItemBinding
 
-class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
+class TrackerListAdapter(private val handler: TrackerListActionHandler): RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
 
-    class ViewHolder(val view: SwipeRevealLayout): RecyclerView.ViewHolder(view) {
-        var cell: View = view.findViewById(R.id.cell)
-        var textView: TextView = view.findViewById(R.id.text_view)
-        var deleteButton: View = view.findViewById(R.id.delete_button)
-    }
+    class ViewHolder(val binding: CellTrackerItemBinding): RecyclerView.ViewHolder(binding.root)
 
     private var items = listOf<TrackedItemViewModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val cell = LayoutInflater.from(parent.context).inflate(R.layout.cell_tracker_item, parent,false)
-        val viewHolder = ViewHolder(cell as SwipeRevealLayout)
-        viewHolder.textView = cell.findViewById(R.id.text_view)
-        return ViewHolder(cell)
+        val inflater = LayoutInflater.from(parent.context)
+        val cellBinding = DataBindingUtil.inflate<CellTrackerItemBinding>(inflater, R.layout.cell_tracker_item, parent, false)
+        return ViewHolder(cellBinding)
     }
 
     override fun getItemCount(): Int {
@@ -32,10 +26,9 @@ class TrackerListAdapter: RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.view.close(false)
-        holder.textView.text = item.itemNameText
-        holder.cell.setOnClickListener { item.onTap() }
-        holder.deleteButton.setOnClickListener { item.onDelete() }
+        holder.binding.handler = handler
+        holder.binding.viewModel = item
+        holder.binding.swipeReveal.close(false)
     }
 
     fun refresh(trackedItems: List<TrackedItemViewModel>) {
