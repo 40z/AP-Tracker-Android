@@ -25,6 +25,7 @@ import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.SettingsNotValid
+import com.movsoft.aptracker.scenes.focus.FocusActivity
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -33,6 +34,7 @@ interface TrackerListActionHandler: TextView.OnEditorActionListener {
     fun onAddItemTapped()
     fun onDeleteItemTapped(trackedItemViewModel: TrackedItemViewModel)
     fun onEditItemTapped(trackedItemViewModel: TrackedItemViewModel)
+    fun onFocusTapped(trackedItemViewModel: TrackedItemViewModel)
     fun onOptionsForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
     fun onAverageForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
     fun onItemTapped(trackedItemViewModel: TrackedItemViewModel)
@@ -119,6 +121,12 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     override fun onEditItemTapped(trackedItemViewModel: TrackedItemViewModel) {
         itemOptionsDialog?.dismiss()
         showEditTrackedItemDialog(trackedItemViewModel)
+    }
+
+    override fun onFocusTapped(trackedItemViewModel: TrackedItemViewModel) {
+        itemOptionsDialog?.dismiss()
+        val focusIntent = FocusActivity.newIntent(this, trackedItemViewModel.itemIdentifier)
+        startActivity(focusIntent)
     }
 
     override fun onOptionsForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout) {

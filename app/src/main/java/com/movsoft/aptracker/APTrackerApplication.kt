@@ -3,6 +3,7 @@ package com.movsoft.aptracker
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.movsoft.aptracker.scenes.focus.FocusViewModel
 import com.movsoft.aptracker.scenes.list.TrackerListViewModel
 import com.movsoft.aptracker.scenes.settings.SettingsViewModel
 import com.movsoft.aptracker.services.*
@@ -27,6 +28,7 @@ class APTrackerApplication: Application(), ViewModelProvider.Factory {
         return when (modelClass) {
             SettingsViewModel::class.java -> SettingsViewModel(settingsServices) as T
             TrackerListViewModel::class.java -> TrackerListViewModel(trackingServices, trackedItemServices, settingsServices) as T
+            FocusViewModel::class.java -> FocusViewModel(trackedItemServices, trackingServices) as T
             else -> modelClass.newInstance()
         }
     }
