@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
-            type="com.movsoft.aptracker.scenes.list.TrackerListViewModel"/>
+            type="com.movsoft.aptracker.scenes.list.TrackerListViewModel" />
+
         <variable
             name="handler"
-            type="com.movsoft.aptracker.scenes.list.TrackerListActionHandler"/>
+            type="com.movsoft.aptracker.scenes.list.TrackerListActionHandler" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -42,7 +44,7 @@
                 android:id="@+id/tracker_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:tracked_items="@{viewModel.trackedItems}"/>
+                app:tracked_items="@{viewModel.trackedItems}" />
 
             <LinearLayout
                 android:id="@+id/settings_placeholder_container"
@@ -60,13 +62,11 @@
                     android:tint="@color/colorPrimary" />
 
                 <TextView
+                    style="@style/HighVisibility"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="@string/visit_settings_to_get_started"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:text="@string/visit_settings_to_get_started" />
 
             </LinearLayout>
 
@@ -78,8 +78,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:tint="@android:color/white"
             android:onClick="@{ () -> handler.onAddItemTapped() }"
+            android:tint="@android:color/white"
             app:srcCompat="@drawable/ic_add" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
