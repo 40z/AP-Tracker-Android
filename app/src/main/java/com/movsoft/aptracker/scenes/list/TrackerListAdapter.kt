@@ -47,7 +47,7 @@ class TrackerListAdapter(private val handler: TrackerListActionHandler): Recycle
     ): DiffUtil.Callback() {
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return originalList[oldItemPosition].itemNameText == newList[newItemPosition].itemNameText
+            return originalList[oldItemPosition].itemIdentifier == newList[newItemPosition].itemIdentifier
         }
 
         override fun getOldListSize(): Int {
