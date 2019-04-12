@@ -1,6 +1,7 @@
 package com.movsoft.aptracker.scenes.list
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -24,16 +25,19 @@ import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.SettingsNotValid
+import com.movsoft.aptracker.scenes.focus.FocusActivity
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 interface TrackerListActionHandler: TextView.OnEditorActionListener {
-    fun onSettingsTapped(view: View)
-    fun onAddItemTapped(view: View)
-    fun onDeleteItemTapped(identifier: String)
-    fun onOptionsForItemTapped(identifier: String, cell: SwipeRevealLayout)
-    fun onAverageForItemTapped(identifier: String, cell: SwipeRevealLayout)
-    fun onItemTapped(identifier: String)
+    fun onSettingsTapped()
+    fun onAddItemTapped()
+    fun onDeleteItemTapped(trackedItemViewModel: TrackedItemViewModel)
+    fun onEditItemTapped(trackedItemViewModel: TrackedItemViewModel)
+    fun onFocusTapped(trackedItemViewModel: TrackedItemViewModel)
+    fun onOptionsForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
+    fun onAverageForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
+    fun onItemTapped(trackedItemViewModel: TrackedItemViewModel)
 }
 
 class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
@@ -74,7 +78,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                onSettingsTapped(binding.trackerList)
+                onSettingsTapped()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -100,32 +104,43 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     // TrackerListActionHandler Conformance
     //------------------------------------------------------------------------------------------------------------------
 
-    override fun onSettingsTapped(view: View) {
+    override fun onSettingsTapped() {
         val settingsIntent = SettingsActivity.newIntent(this)
         startActivity(settingsIntent)
     }
 
-    override fun onAddItemTapped(view: View) {
+    override fun onAddItemTapped() {
         showAddTrackedItemDialog()
     }
 
-    override fun onDeleteItemTapped(identifier: String) {
-        viewModel.deleteItem(identifier)
+    override fun onDeleteItemTapped(trackedItemViewModel: TrackedItemViewModel) {
+        viewModel.deleteItem(trackedItemViewModel.itemIdentifier)
         itemOptionsDialog?.dismiss()
     }
 
-    override fun onOptionsForItemTapped(identifier: String, cell: SwipeRevealLayout) {
-        cell.close(true)
-        showOptionsDialog(identifier)
+    override fun onEditItemTapped(trackedItemViewModel: TrackedItemViewModel) {
+        itemOptionsDialog?.dismiss()
+        showEditTrackedItemDialog(trackedItemViewModel)
     }
 
-    override fun onAverageForItemTapped(identifier: String, cell: SwipeRevealLayout) {
-        cell.close(true)
-        viewModel.trackAverageItem(identifier)
+    override fun onFocusTapped(trackedItemViewModel: TrackedItemViewModel) {
+        itemOptionsDialog?.dismiss()
+        val focusIntent = FocusActivity.newIntent(this, trackedItemViewModel.itemIdentifier)
+        startActivity(focusIntent)
     }
 
-    override fun onItemTapped(identifier: String) {
-        viewModel.trackItem(identifier)
+    override fun onOptionsForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout) {
+        cell.close(true)
+        showOptionsDialog(trackedItemViewModel)
+    }
+
+    override fun onAverageForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout) {
+        cell.close(true)
+        viewModel.trackAverageItem(trackedItemViewModel.itemIdentifier)
+    }
+
+    override fun onItemTapped(trackedItemViewModel: TrackedItemViewModel) {
+        viewModel.trackItem(trackedItemViewModel.itemIdentifier)
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -141,13 +156,31 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     // UI
     //------------------------------------------------------------------------------------------------------------------
 
-    private fun showOptionsDialog(identifier: String) {
+    private fun showOptionsDialog(trackedItemViewModel: TrackedItemViewModel) {
         itemOptionsDialog = BottomSheetDialog(this)
         val binding = DataBindingUtil.inflate<DialogTrackableOptionsBottomSheetBinding>(layoutInflater, R.layout.dialog_trackable_options_bottom_sheet, binding.trackerList, false)
         binding.handler = this
-        binding.trackedItemIdentifier = identifier
+        binding.trackedItemViewModel = trackedItemViewModel
         itemOptionsDialog!!.setContentView(binding.root)
         itemOptionsDialog!!.show()
+    }
+
+    private fun showEditTrackedItemDialog(trackedItemViewModel: TrackedItemViewModel) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_new_trackable, null)
+        val dialogEditText = dialogView.findViewById<EditText>(R.id.edit_text)
+        dialogEditText.setText(trackedItemViewModel.itemNameText, TextView.BufferType.EDITABLE)
+        dialogEditText.setOnEditorActionListener(this)
+        dialogEditText.requestFocus()
+
+        addItemDialog = AlertDialog.Builder(this).create()
+        addItemDialog!!.setTitle(getString(R.string.edit_item))
+        addItemDialog!!.setView(dialogView)
+        addItemDialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        addItemDialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save)) { _, _ ->
+            viewModel.editItem(trackedItemViewModel.itemIdentifier, dialogEditText.text.toString())
+        }
+        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _-> }
+        addItemDialog!!.show()
     }
 
     private fun showAddTrackedItemDialog() {

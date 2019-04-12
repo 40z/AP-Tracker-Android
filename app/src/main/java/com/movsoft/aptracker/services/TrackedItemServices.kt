@@ -3,7 +3,9 @@ package com.movsoft.aptracker.services
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.movsoft.aptracker.models.TrackedItem
+import java.lang.reflect.Type
 
 typealias GetTrackedItemsCompletion = (result: Result<List<TrackedItem>>) -> Unit
 
@@ -12,8 +14,10 @@ typealias GetTrackedItemsCompletion = (result: Result<List<TrackedItem>>) -> Uni
  */
 interface TrackedItemServices {
     fun getTrackedItems(completion: GetTrackedItemsCompletion)
+    fun getTrackedItem(itemIdentifier: String): TrackedItem?
     fun addTrackedItem(itemName: String)
-    fun deleteTrackedItem(itemName: String)
+    fun updateTrackedItem(item: TrackedItem)
+    fun deleteTrackedItem(itemIdentifier: String)
 }
 
 /**
@@ -21,7 +25,7 @@ interface TrackedItemServices {
  */
 class SharedPreferencesTrackedItemServices(context: Context): TrackedItemServices {
 
-    private var items: MutableList<TrackedItem>
+    private var items: LinkedHashSet<TrackedItem>
     private var sharedPrefs: SharedPreferences
 
     init {
@@ -30,29 +34,46 @@ class SharedPreferencesTrackedItemServices(context: Context): TrackedItemService
     }
 
     override fun getTrackedItems(completion: GetTrackedItemsCompletion) {
-        completion(Result.success(items))
+        completion(Result.success(items.toList()))
+    }
+
+    override fun getTrackedItem(itemIdentifier: String): TrackedItem? {
+        return items.firstOrNull { it.identifier == itemIdentifier }
     }
 
     override fun addTrackedItem(itemName: String) {
-        items.add(TrackedItem(itemName))
+        val newItem = TrackedItem(name = itemName)
+        items.add(newItem)
         persist(items)
     }
 
-    override fun deleteTrackedItem(itemName: String) {
-        items.remove(TrackedItem(itemName))
+    override fun updateTrackedItem(item: TrackedItem) {
+        items.add(item)
         persist(items)
     }
 
-    private fun persist(items: MutableList<TrackedItem>) {
+    override fun deleteTrackedItem(itemIdentifier: String) {
+        val item = items.first { it.identifier == itemIdentifier }
+        items.remove(item)
+        persist(items)
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Helpers
+    //------------------------------------------------------------------------------------------------------------------
+
+    private fun persist(items: LinkedHashSet<TrackedItem>) {
         val json = GsonBuilder().create().toJson(items)
         val prefsEditor = sharedPrefs.edit()
         prefsEditor.putString("trackedItemsJSON", json)
         prefsEditor.apply()
     }
 
-    private fun loadItems(): MutableList<TrackedItem> {
+    private fun loadItems(): LinkedHashSet<TrackedItem> {
         val json = sharedPrefs.getString("trackedItemsJSON", "[]")
-        val loadedItems = GsonBuilder().create().fromJson(json, Array<TrackedItem>::class.java)
-        return loadedItems.toMutableList()
+        val builder = GsonBuilder()
+        builder.registerTypeAdapter(TrackedItem::class.java, TrackedItem.Deserializer())
+        val type: Type = object : TypeToken<LinkedHashSet<TrackedItem>>() {}.type
+        return builder.create().fromJson(json, type)
     }
 }

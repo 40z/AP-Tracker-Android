@@ -10,4 +10,7 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="edit_item">Edit Tracked Item</string>
+    <string name="edit">Edit</string>
+    <string name="focus">Focus</string>
 </resources>

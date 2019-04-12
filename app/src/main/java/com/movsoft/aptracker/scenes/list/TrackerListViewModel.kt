@@ -54,29 +54,36 @@ class TrackerListViewModel(
         refresh()
     }
 
+    fun editItem(itemIdentifier: String, itemName: String) {
+        val item = trackedItemServices.getTrackedItem(itemIdentifier) ?: return
+        item.name = itemName
+        trackedItemServices.updateTrackedItem(item)
+        refresh()
+    }
+
     fun deleteItem(itemIdentifier: String) {
         trackedItemServices.deleteTrackedItem(itemIdentifier)
         refresh()
     }
 
     fun trackItem(itemIdentifier: String) {
-        val item = trackedItems.value?.first { it.itemIdentifier == itemIdentifier }
-        trackingServices.track(itemIdentifier) { result ->
-            if (result.isFailure) listener?.showError("Error tracking ${item?.itemNameText}")
+        val item = trackedItemServices.getTrackedItem(itemIdentifier) ?: return
+        trackingServices.track(item.name) { result ->
+            if (result.isFailure) listener?.showError("Error tracking ${item.name}")
             else {
                 val trackingResult = result.getOrDefault(TrackItemResult(STARTED))
                 val startStop = if (trackingResult.status == STARTED) "Started" else "Stopped"
-                listener?.showMessage("$startStop tracking ${item?.itemNameText}")
+                listener?.showMessage("$startStop tracking ${item.name}")
             }
         }
     }
 
     fun trackAverageItem(itemIdentifier: String) {
-        val item = trackedItems.value?.first { it.itemIdentifier == itemIdentifier }
-        trackingServices.trackAverage(itemIdentifier) { result ->
-            if (result.isFailure) listener?.showError("Error tracking ${item?.itemNameText}")
+        val item = trackedItemServices.getTrackedItem(itemIdentifier) ?: return
+        trackingServices.trackAverage(item.name) { result ->
+            if (result.isFailure) listener?.showError("Error tracking ${item.name}")
             else {
-                listener?.showMessage("Tracked average ${item?.itemNameText}")
+                listener?.showMessage("Tracked average ${item.name}")
             }
         }
     }
