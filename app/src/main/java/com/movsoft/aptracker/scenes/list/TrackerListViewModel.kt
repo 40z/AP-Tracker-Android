@@ -54,6 +54,13 @@ class TrackerListViewModel(
         refresh()
     }
 
+    fun editItem(itemIdentifier: String, itemName: String) {
+        val item = trackedItemServices.getTrackedItem(itemIdentifier) ?: return
+        item.name = itemName
+        trackedItemServices.updateTrackedItem(item)
+        refresh()
+    }
+
     fun deleteItem(itemIdentifier: String) {
         trackedItemServices.deleteTrackedItem(itemIdentifier)
         refresh()
