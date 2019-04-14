@@ -74,6 +74,8 @@ class SharedPreferencesTrackedItemServices(context: Context): TrackedItemService
         val builder = GsonBuilder()
         builder.registerTypeAdapter(TrackedItem::class.java, TrackedItem.Deserializer())
         val type: Type = object : TypeToken<LinkedHashSet<TrackedItem>>() {}.type
-        return builder.create().fromJson(json, type)
+        val items: LinkedHashSet<TrackedItem> = builder.create().fromJson(json, type)
+        persist(items)
+        return items
     }
 }
