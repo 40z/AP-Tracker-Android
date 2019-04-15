@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.movsoft.aptracker.models.TrackedItem
+import com.movsoft.aptracker.models.TrackedItemSettings
 import java.lang.reflect.Type
 
 typealias GetTrackedItemsCompletion = (result: Result<List<TrackedItem>>) -> Unit
@@ -15,7 +16,7 @@ typealias GetTrackedItemsCompletion = (result: Result<List<TrackedItem>>) -> Uni
 interface TrackedItemServices {
     fun getTrackedItems(completion: GetTrackedItemsCompletion)
     fun getTrackedItem(itemIdentifier: String): TrackedItem?
-    fun addTrackedItem(itemName: String)
+    fun addTrackedItem(item: TrackedItem)
     fun updateTrackedItem(item: TrackedItem)
     fun deleteTrackedItem(itemIdentifier: String)
 }
@@ -41,9 +42,8 @@ class SharedPreferencesTrackedItemServices(context: Context): TrackedItemService
         return items.firstOrNull { it.identifier == itemIdentifier }
     }
 
-    override fun addTrackedItem(itemName: String) {
-        val newItem = TrackedItem(name = itemName)
-        items.add(newItem)
+    override fun addTrackedItem(item: TrackedItem) {
+        items.add(item)
         persist(items)
     }
 
@@ -73,6 +73,7 @@ class SharedPreferencesTrackedItemServices(context: Context): TrackedItemService
         val json = sharedPrefs.getString("trackedItemsJSON", "[]")
         val builder = GsonBuilder()
         builder.registerTypeAdapter(TrackedItem::class.java, TrackedItem.Deserializer())
+        builder.registerTypeAdapter(TrackedItemSettings::class.java, TrackedItemSettings.Deserializer())
         val type: Type = object : TypeToken<LinkedHashSet<TrackedItem>>() {}.type
         val items: LinkedHashSet<TrackedItem> = builder.create().fromJson(json, type)
         persist(items)

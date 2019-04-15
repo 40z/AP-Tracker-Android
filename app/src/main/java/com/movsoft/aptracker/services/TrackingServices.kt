@@ -7,6 +7,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.GsonBuilder
 import com.movsoft.aptracker.models.TrackItemResult
+import com.movsoft.aptracker.models.TrackedItem
 import org.json.JSONObject
 
 typealias TrackItemCompletion = (result: Result<TrackItemResult>) -> Unit
@@ -15,19 +16,19 @@ typealias TrackItemCompletion = (result: Result<TrackItemResult>) -> Unit
  * Services that provide tracking functionality.
  */
 interface TrackingServices {
-    fun track(item: String, completion: TrackItemCompletion)
-    fun trackAverage(item: String, completion: TrackItemCompletion)
+    fun track(item: TrackedItem, completion: TrackItemCompletion)
+    fun trackAverage(item: TrackedItem, completion: TrackItemCompletion)
 }
 
 /**
  * Implementation of TrackingServices that does nothing.
  */
 class DummyTrackingServices: TrackingServices {
-    override fun track(item: String, completion: TrackItemCompletion) {
+    override fun track(item: TrackedItem, completion: TrackItemCompletion) {
         completion(Result.success(TrackItemResult(TrackItemResult.Status.STARTED)))
     }
 
-    override fun trackAverage(item: String, completion: TrackItemCompletion) {
+    override fun trackAverage(item: TrackedItem, completion: TrackItemCompletion) {
         completion(Result.success(TrackItemResult(TrackItemResult.Status.STARTED)))
     }
 }
@@ -39,22 +40,25 @@ class RafiTrackingServices(context: Context, private val settingsServices: Setti
 
     private val queue = Volley.newRequestQueue(context)
 
-    override fun track(item: String, completion: TrackItemCompletion) {
+    override fun track(item: TrackedItem, completion: TrackItemCompletion) {
         val settings = settingsServices.getSettings()
-        val path = "/hubot/aptracker/${settings.trackingChannel}"
+        val trackingChannel = item.settings.trackingChannel ?: settings.trackingChannel
+        val trackingMode = item.settings.trackingMode.value
+        val path = "/hubot/aptracker/$trackingChannel"
         val jsonBody = JSONObject()
         jsonBody.put("user", settings.userName)
-        jsonBody.put("trackeditem", item)
-        jsonBody.put("action", "SINGLE")
+        jsonBody.put("trackeditem", item.name)
+        jsonBody.put("action", trackingMode)
         makeRequest(path, jsonBody, TrackItemResult::class.java, completion)
     }
 
-    override fun trackAverage(item: String, completion: TrackItemCompletion) {
+    override fun trackAverage(item: TrackedItem, completion: TrackItemCompletion) {
         val settings = settingsServices.getSettings()
-        val path = "/hubot/aptracker/${settings.trackingChannel}"
+        val trackingChannel = item.settings.trackingChannel ?: settings.trackingChannel
+        val path = "/hubot/aptracker/$trackingChannel"
         val jsonBody = JSONObject()
         jsonBody.put("user", settings.userName)
-        jsonBody.put("trackeditem", item)
+        jsonBody.put("trackeditem", item.name)
         jsonBody.put("action", "AVERAGE")
         makeRequest(path, jsonBody, TrackItemResult::class.java, completion)
     }

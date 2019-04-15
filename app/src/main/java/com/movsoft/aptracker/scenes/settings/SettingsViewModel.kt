@@ -1,7 +1,7 @@
 package com.movsoft.aptracker.scenes.settings
 
 import androidx.lifecycle.ViewModel
-import com.movsoft.aptracker.models.Settings
+import com.movsoft.aptracker.models.AppSettings
 import com.movsoft.aptracker.services.SettingsServices
 
 /**
@@ -21,7 +21,7 @@ class SettingsViewModel(private val settingsServices: SettingsServices): ViewMod
     }
 
     fun save() {
-        val settingsFromForm = Settings(userNameText, rafiHostText, trackingChannelText)
+        val settingsFromForm = AppSettings(userNameText, rafiHostText, trackingChannelText)
         settingsServices.saveSettings(settingsFromForm)
     }
 }

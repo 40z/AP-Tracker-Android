@@ -1,10 +1,10 @@
 package com.movsoft.aptracker.models
 
 /**
- * Settings model.
+ * AppSettings model.
  * Keeps track of the user's tracking settings.
  */
-data class Settings(var userName: String?, var server: String?, var trackingChannel: String?) {
+data class AppSettings(var userName: String?, var server: String?, var trackingChannel: String?) {
 
     /**
      * Valid settings needs to have all properties non-null.

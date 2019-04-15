@@ -8,7 +8,8 @@ import java.util.*
 
 class TrackedItem(
     val identifier: String = UUID.randomUUID().toString(),
-    var name: String
+    var name: String,
+    var settings: TrackedItemSettings = TrackedItemSettings()
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -28,7 +29,8 @@ class TrackedItem(
             val jObj = json?.asJsonObject ?: return TrackedItem(name = "")
             val identifier = jObj["identifier"]?.asString ?: UUID.randomUUID().toString()
             val name = jObj["name"]?.asString ?: ""
-            return TrackedItem(identifier, name)
+            val settings = context?.deserialize<TrackedItemSettings>(jObj["settings"], TrackedItemSettings::class.java) ?: TrackedItemSettings()
+            return TrackedItem(identifier, name, settings)
         }
     }
 }

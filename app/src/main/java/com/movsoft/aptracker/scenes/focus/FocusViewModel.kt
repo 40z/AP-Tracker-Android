@@ -28,7 +28,7 @@ class FocusViewModel(private val trackedItemServices: TrackedItemServices, priva
 
     fun trackItem() {
         val frozenItem = item ?: return
-        trackingServices.track(frozenItem.name) { result ->
+        trackingServices.track(frozenItem) { result ->
             if (result.isFailure) listener?.showError("Error tracking $itemNameText")
             else {
                 val trackingResult = result.getOrDefault(TrackItemResult(STARTED))

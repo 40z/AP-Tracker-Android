@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.movsoft.aptracker.BuildConfig
 import com.movsoft.aptracker.models.TrackItemResult
 import com.movsoft.aptracker.models.TrackItemResult.Status.STARTED
+import com.movsoft.aptracker.models.TrackedItem
+import com.movsoft.aptracker.models.TrackedItemSettings
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.*
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.NoContent
@@ -60,7 +62,8 @@ class TrackerListViewModel(
     }
 
     fun addItem(itemName: String) {
-        trackedItemServices.addTrackedItem(itemName)
+        val newItem = TrackedItem(name = itemName)
+        trackedItemServices.addTrackedItem(newItem)
         refresh()
     }
 
@@ -78,7 +81,7 @@ class TrackerListViewModel(
 
     fun trackItem(itemIdentifier: String) {
         val item = trackedItemServices.getTrackedItem(itemIdentifier) ?: return
-        trackingServices.track(item.name) { result ->
+        trackingServices.track(item) { result ->
             if (result.isFailure) listener?.showError("Error tracking ${item.name}")
             else {
                 val trackingResult = result.getOrDefault(TrackItemResult(STARTED))
@@ -90,7 +93,7 @@ class TrackerListViewModel(
 
     fun trackAverageItem(itemIdentifier: String) {
         val item = trackedItemServices.getTrackedItem(itemIdentifier) ?: return
-        trackingServices.trackAverage(item.name) { result ->
+        trackingServices.trackAverage(item) { result ->
             if (result.isFailure) listener?.showError("Error tracking ${item.name}")
             else {
                 listener?.showMessage("Tracked average ${item.name}")
