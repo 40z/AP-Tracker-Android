@@ -1,11 +1,11 @@
 package com.movsoft.aptracker.scenes.list
 
+import android.content.Context
 import android.os.Bundle
-import android.text.Editable
+import android.os.Vibrator
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
@@ -37,7 +37,7 @@ interface TrackerListActionHandler: TextView.OnEditorActionListener {
     fun onFocusTapped(trackedItemViewModel: TrackedItemViewModel)
     fun onOptionsForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
     fun onAverageForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
-    fun onItemTapped(trackedItemViewModel: TrackedItemViewModel)
+    fun onItemTapped(trackedItemViewModel: TrackedItemViewModel): Boolean
 }
 
 class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
@@ -139,8 +139,11 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         viewModel.trackAverageItem(trackedItemViewModel.itemIdentifier)
     }
 
-    override fun onItemTapped(trackedItemViewModel: TrackedItemViewModel) {
+    override fun onItemTapped(trackedItemViewModel: TrackedItemViewModel): Boolean {
+        val vib = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vib.vibrate(200)
         viewModel.trackItem(trackedItemViewModel.itemIdentifier)
+        return false
     }
 
     //------------------------------------------------------------------------------------------------------------------

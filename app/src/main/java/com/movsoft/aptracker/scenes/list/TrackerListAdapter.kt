@@ -5,12 +5,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.CellTrackerItemBinding
 
 class TrackerListAdapter(private val handler: TrackerListActionHandler): RecyclerView.Adapter<TrackerListAdapter.ViewHolder>() {
-
-    class ViewHolder(val binding: CellTrackerItemBinding): RecyclerView.ViewHolder(binding.root)
 
     private var items = listOf<TrackedItemViewModel>()
 
@@ -28,7 +27,7 @@ class TrackerListAdapter(private val handler: TrackerListActionHandler): Recycle
         val item = items[position]
         holder.binding.handler = handler
         holder.binding.viewModel = item
-        holder.binding.swipeReveal.close(false)
+        holder.prepareForBinding()
     }
 
     fun refresh(trackedItems: List<TrackedItemViewModel>) {
@@ -60,6 +59,39 @@ class TrackerListAdapter(private val handler: TrackerListActionHandler): Recycle
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return originalList[oldItemPosition].itemNameText == newList[newItemPosition].itemNameText
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // ViewHolder
+    //------------------------------------------------------------------------------------------------------------------
+
+    class ViewHolder(val binding: CellTrackerItemBinding): RecyclerView.ViewHolder(binding.root), SwipeRevealLayout.SwipeListener {
+
+        init {
+            binding.swipeReveal.setSwipeListener(this)
+        }
+
+        fun prepareForBinding() {
+            binding.swipeReveal.close(false)
+            makeClickable(true)
+        }
+
+        fun makeClickable(shouldBeClickable: Boolean) {
+            binding.cell.isLongClickable = shouldBeClickable
+            if (!shouldBeClickable) binding.cell.isPressed = false
+        }
+
+        override fun onOpened(view: SwipeRevealLayout?) {
+            makeClickable(false)
+        }
+
+        override fun onClosed(view: SwipeRevealLayout?) {
+            makeClickable(true)
+        }
+
+        override fun onSlide(view: SwipeRevealLayout?, slideOffset: Float) {
+            makeClickable(false)
         }
     }
 }
