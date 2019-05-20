@@ -91,7 +91,7 @@ class TrackerListAdapter(private val handler: TrackerListActionHandler): Recycle
         }
 
         override fun onSlide(view: SwipeRevealLayout?, slideOffset: Float) {
-            makeClickable(false)
+            if (slideOffset > 0.2) makeClickable(false)
         }
     }
 }
