@@ -4,6 +4,7 @@ import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.movsoft.aptracker.BuildConfig
 import com.movsoft.aptracker.models.TrackItemResult
 import com.movsoft.aptracker.models.TrackItemResult.Status.STARTED
 import com.movsoft.aptracker.scenes.base.ViewModelState
@@ -31,9 +32,18 @@ class TrackerListViewModel(
 
     var trackedItems: MutableLiveData<List<TrackedItemViewModel>> = MutableLiveData()
 
+    var shouldShowWhatsNew: MutableLiveData<Boolean> = MutableLiveData()
+
+    var lastUsedVersionCode: Int = 0
+
     private val callbacks: PropertyChangeRegistry = PropertyChangeRegistry()
 
     fun refresh() {
+
+        //Show whats new if they haven't seen release notes for this version
+        lastUsedVersionCode = settingsServices.getLastUsedVersionCode()
+        shouldShowWhatsNew.value = lastUsedVersionCode < BuildConfig.VERSION_CODE
+
         //Show a placeholder screen if settings aren't set up
         if (!settingsServices.getSettings().isValid()) {
             state.value = Placeholder(SettingsNotValid)
@@ -86,6 +96,12 @@ class TrackerListViewModel(
                 listener?.showMessage("Tracked average ${item.name}")
             }
         }
+    }
+
+    fun markWhatsNewAsSeen() {
+        lastUsedVersionCode = BuildConfig.VERSION_CODE
+        settingsServices.saveLastUsedVersionCode(lastUsedVersionCode)
+        shouldShowWhatsNew.value = false
     }
 
     //------------------------------------------------------------------------------------------------------------------
