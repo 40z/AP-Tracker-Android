@@ -54,10 +54,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/cell"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/clickable_white"
-            android:onClick="@{ () -> handler.onItemTapped(viewModel) }"
+            android:onLongClick="@{ (view) -> handler.onItemTapped(viewModel) }"
             android:orientation="vertical">
 
             <TextView

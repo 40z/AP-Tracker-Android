@@ -1,11 +1,11 @@
 package com.movsoft.aptracker.scenes.list
 
+import android.content.Context
 import android.os.Bundle
-import android.text.Editable
+import android.os.Vibrator
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.chauthai.swipereveallayout.SwipeRevealLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import com.michaelflisar.changelog.ChangelogBuilder
 import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivityMainBinding
 import com.movsoft.aptracker.databinding.DialogTrackableOptionsBottomSheetBinding
@@ -29,7 +30,7 @@ import com.movsoft.aptracker.scenes.focus.FocusActivity
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-interface TrackerListActionHandler: TextView.OnEditorActionListener {
+interface TrackerListActionHandler : TextView.OnEditorActionListener {
     fun onSettingsTapped()
     fun onAddItemTapped()
     fun onDeleteItemTapped(trackedItemViewModel: TrackedItemViewModel)
@@ -37,7 +38,7 @@ interface TrackerListActionHandler: TextView.OnEditorActionListener {
     fun onFocusTapped(trackedItemViewModel: TrackedItemViewModel)
     fun onOptionsForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
     fun onAverageForItemTapped(trackedItemViewModel: TrackedItemViewModel, cell: SwipeRevealLayout)
-    fun onItemTapped(trackedItemViewModel: TrackedItemViewModel)
+    fun onItemTapped(trackedItemViewModel: TrackedItemViewModel): Boolean
 }
 
 class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
@@ -59,6 +60,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         binding.trackerList.layoutManager = LinearLayoutManager(this)
 
         viewModel.state.observe(this, Observer { transitionToState(it) })
+        viewModel.shouldShowWhatsNew.observe(this, Observer { invalidateOptionsMenu() })
 
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -71,7 +73,9 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
+        val showWhatsNew = viewModel.shouldShowWhatsNew.value ?: false
+        val menuResource = if (showWhatsNew) R.menu.menu_whats_new else R.menu.menu_main
+        menuInflater.inflate(menuResource, menu)
         return true
     }
 
@@ -79,6 +83,10 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         return when (item.itemId) {
             R.id.action_settings -> {
                 onSettingsTapped()
+                true
+            }
+            R.id.action_whats_new -> {
+                showWhatsNewDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -139,8 +147,11 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         viewModel.trackAverageItem(trackedItemViewModel.itemIdentifier)
     }
 
-    override fun onItemTapped(trackedItemViewModel: TrackedItemViewModel) {
+    override fun onItemTapped(trackedItemViewModel: TrackedItemViewModel): Boolean {
+        val vib = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vib.vibrate(200)
         viewModel.trackItem(trackedItemViewModel.itemIdentifier)
+        return false
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -179,7 +190,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         addItemDialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save)) { _, _ ->
             viewModel.editItem(trackedItemViewModel.itemIdentifier, dialogEditText.text.toString())
         }
-        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _-> }
+        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ -> }
         addItemDialog!!.show()
     }
 
@@ -196,8 +207,16 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
         addItemDialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.add)) { _, _ ->
             viewModel.addItem(dialogEditText.text.toString())
         }
-        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _-> }
+        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ -> }
         addItemDialog!!.show()
+    }
+
+    private fun showWhatsNewDialog() {
+        ChangelogBuilder()
+            .withTitle(getString(R.string.whats_new))
+            .withMinVersionToShow(viewModel.lastUsedVersionCode)
+            .buildAndShowDialog(this, false)
+        viewModel.markWhatsNewAsSeen()
     }
 
     private fun transitionToState(state: ViewModelState) {
