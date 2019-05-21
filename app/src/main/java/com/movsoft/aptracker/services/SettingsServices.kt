@@ -40,6 +40,6 @@ class SharedPreferencesSettingsServices(context: Context): SettingsServices {
     }
 
     override fun getLastUsedVersionCode(): Int {
-        return sharedPrefs.getInt("lastUsedVersionCode", 6)
+        return sharedPrefs.getInt("lastUsedVersionCode", 5)
     }
 }
