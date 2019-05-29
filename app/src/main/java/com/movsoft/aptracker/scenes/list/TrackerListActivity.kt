@@ -184,7 +184,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     private fun showWhatsNewDialog() {
         ChangelogBuilder()
             .withTitle(getString(R.string.whats_new))
-            .withMinVersionToShow(viewModel.lastUsedVersionCode)
+            .withMinVersionToShow(viewModel.lastUsedVersionCode + 1)
             .buildAndShowDialog(this, false)
         viewModel.markWhatsNewAsSeen()
     }

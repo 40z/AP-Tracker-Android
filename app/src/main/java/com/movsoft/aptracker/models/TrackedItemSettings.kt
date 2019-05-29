@@ -21,8 +21,8 @@ class TrackedItemSettings(var trackingChannel: String? = null, var trackingMode:
         companion object {
             fun fromSerializedName(name: String): TrackingMode? {
                 return when (name) {
-                    "SINGLE" -> SINGLE
-                    "DOUBLE" -> TOGGLE
+                    "SINGLE" -> TOGGLE
+                    "DOUBLE" -> SINGLE
                     else     -> null
                 }
             }
