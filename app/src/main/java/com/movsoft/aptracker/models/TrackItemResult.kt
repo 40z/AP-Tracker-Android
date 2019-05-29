@@ -11,6 +11,8 @@ data class TrackItemResult(val status: Status) {
         @SerializedName("started")
         STARTED("started"),
         @SerializedName("stopped")
-        STOPPED("stopped")
+        STOPPED("stopped"),
+        @SerializedName("single")
+        SINGLE("single")
     }
 }

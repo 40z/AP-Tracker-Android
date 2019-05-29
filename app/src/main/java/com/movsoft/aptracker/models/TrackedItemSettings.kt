@@ -13,16 +13,16 @@ import java.lang.reflect.Type
 class TrackedItemSettings(var trackingChannel: String? = null, var trackingMode: TrackingMode = TrackingMode.TOGGLE) {
 
     enum class TrackingMode(val value: String) {
-        @SerializedName("SINGLE")
-        TOGGLE("SINGLE"),
-        @SerializedName("DOUBLE")
-        SINGLE("DOUBLE");
+        @SerializedName("TOGGLE")
+        TOGGLE("TOGGLE"),
+        @SerializedName("REAL SINGLE")
+        SINGLE("REAL SINGLE");
 
         companion object {
             fun fromSerializedName(name: String): TrackingMode? {
                 return when (name) {
-                    "SINGLE" -> TOGGLE
-                    "DOUBLE" -> SINGLE
+                    "TOGGLE" -> TOGGLE
+                    "REAL SINGLE" -> SINGLE
                     else     -> null
                 }
             }

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.movsoft.aptracker.BuildConfig
 import com.movsoft.aptracker.models.TrackItemResult
-import com.movsoft.aptracker.models.TrackItemResult.Status.STARTED
+import com.movsoft.aptracker.models.TrackItemResult.Status.*
 import com.movsoft.aptracker.models.TrackedItem
 import com.movsoft.aptracker.models.TrackedItemSettings
 import com.movsoft.aptracker.scenes.base.ViewModelState
@@ -85,8 +85,11 @@ class TrackerListViewModel(
             if (result.isFailure) listener?.showError("Error tracking ${item.name}")
             else {
                 val trackingResult = result.getOrDefault(TrackItemResult(STARTED))
-                val startStop = if (trackingResult.status == STARTED) "Started" else "Stopped"
-                listener?.showMessage("$startStop tracking ${item.name}")
+                when(trackingResult.status) {
+                    STARTED -> listener?.showMessage("Started tracking ${item.name}")
+                    STOPPED -> listener?.showMessage("Stopped tracking ${item.name}")
+                    SINGLE -> listener?.showMessage("Tracked single ${item.name}")
+                }
             }
         }
     }
