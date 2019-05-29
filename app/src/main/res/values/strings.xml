@@ -14,4 +14,9 @@
     <string name="edit">Edit</string>
     <string name="focus">Focus</string>
     <string name="whats_new">What\'s New</string>
+    <string name="name">Name</string>
+    <string name="tracking_channel_optional">Tracking Channel (optional)</string>
+    <string name="tracking_style">Tracking Style</string>
+    <string name="toggle">Toggle</string>
+    <string name="single">Single</string>
 </resources>

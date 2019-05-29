@@ -3,15 +3,10 @@ package com.movsoft.aptracker.scenes.list
 import android.content.Context
 import android.os.Bundle
 import android.os.Vibrator
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-import android.widget.EditText
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +17,8 @@ import com.michaelflisar.changelog.ChangelogBuilder
 import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivityMainBinding
 import com.movsoft.aptracker.databinding.DialogTrackableOptionsBottomSheetBinding
+import com.movsoft.aptracker.scenes.add_item.AddTrackedItemDialog
+import com.movsoft.aptracker.scenes.add_item.EditTrackedItemDialog
 import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
@@ -30,7 +27,7 @@ import com.movsoft.aptracker.scenes.focus.FocusActivity
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-interface TrackerListActionHandler : TextView.OnEditorActionListener {
+interface TrackerListActionHandler {
     fun onSettingsTapped()
     fun onAddItemTapped()
     fun onDeleteItemTapped(trackedItemViewModel: TrackedItemViewModel)
@@ -41,10 +38,9 @@ interface TrackerListActionHandler : TextView.OnEditorActionListener {
     fun onItemTapped(trackedItemViewModel: TrackedItemViewModel): Boolean
 }
 
-class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler {
+class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listener, TrackerListActionHandler, AddTrackedItemDialog.Handler {
 
     private lateinit var binding: ActivityMainBinding
-    private var addItemDialog: AlertDialog? = null
     private var itemOptionsDialog: BottomSheetDialog? = null
     private lateinit var viewModel: TrackerListViewModel
 
@@ -109,6 +105,14 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     }
 
     //------------------------------------------------------------------------------------------------------------------
+    // AddTrackedItemDialog.Handler Conformance
+    //------------------------------------------------------------------------------------------------------------------
+
+    override fun onTrackedItemAddedOrUpdated() {
+        viewModel.refresh()
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
     // TrackerListActionHandler Conformance
     //------------------------------------------------------------------------------------------------------------------
 
@@ -155,15 +159,6 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // OnEditorActionListene Conformance
-    //------------------------------------------------------------------------------------------------------------------
-
-    override fun onEditorAction(p0: TextView?, p1: Int, p2: KeyEvent?): Boolean {
-        addItemDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick()
-        return true
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
     // UI
     //------------------------------------------------------------------------------------------------------------------
 
@@ -177,38 +172,13 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
     }
 
     private fun showEditTrackedItemDialog(trackedItemViewModel: TrackedItemViewModel) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_new_trackable, null)
-        val dialogEditText = dialogView.findViewById<EditText>(R.id.edit_text)
-        dialogEditText.setText(trackedItemViewModel.itemNameText, TextView.BufferType.EDITABLE)
-        dialogEditText.setOnEditorActionListener(this)
-        dialogEditText.requestFocus()
-
-        addItemDialog = AlertDialog.Builder(this).create()
-        addItemDialog!!.setTitle(getString(R.string.edit_item))
-        addItemDialog!!.setView(dialogView)
-        addItemDialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        addItemDialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save)) { _, _ ->
-            viewModel.editItem(trackedItemViewModel.itemIdentifier, dialogEditText.text.toString())
-        }
-        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ -> }
-        addItemDialog!!.show()
+        val dialog = EditTrackedItemDialog(this, trackedItemViewModel.itemIdentifier, this)
+        dialog.show()
     }
 
     private fun showAddTrackedItemDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_new_trackable, null)
-        val dialogEditText = dialogView.findViewById<EditText>(R.id.edit_text)
-        dialogEditText.setOnEditorActionListener(this)
-        dialogEditText.requestFocus()
-
-        addItemDialog = AlertDialog.Builder(this).create()
-        addItemDialog!!.setTitle(getString(R.string.add_new_item))
-        addItemDialog!!.setView(dialogView)
-        addItemDialog!!.window?.setSoftInputMode(SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        addItemDialog!!.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.add)) { _, _ ->
-            viewModel.addItem(dialogEditText.text.toString())
-        }
-        addItemDialog!!.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ -> }
-        addItemDialog!!.show()
+        val dialog = AddTrackedItemDialog(this, this)
+        dialog.show()
     }
 
     private fun showWhatsNewDialog() {
