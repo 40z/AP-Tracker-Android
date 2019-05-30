@@ -1,5 +1,9 @@
 <changelog>
 
+    <release versionCode="8" versionName="v1.3" date="2019-05-29">
+        <new>Additional tracking options available. Add or edit an item to check out the changes!</new>
+    </release>
+
     <release versionCode="6" versionName="v1.2.2" date="2019-05-21">
         <new>You now need to long-press on a row to start/stop tracking.</new>
         <bugfix>Rows can no longer be tapped when the swipe menu is open.</bugfix>

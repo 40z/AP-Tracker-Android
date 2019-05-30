@@ -2,35 +2,35 @@ package com.movsoft.aptracker.services
 
 import android.content.Context
 import com.google.gson.GsonBuilder
-import com.movsoft.aptracker.models.Settings
+import com.movsoft.aptracker.models.AppSettings
 
 /**
- * Services that retrieve and persist Settings.
+ * Services that retrieve and persist AppSettings.
  */
 interface SettingsServices {
-    fun saveSettings(settings: Settings)
-    fun getSettings(): Settings
+    fun saveSettings(appSettings: AppSettings)
+    fun getSettings(): AppSettings
     fun saveLastUsedVersionCode(code: Int)
     fun getLastUsedVersionCode(): Int
 }
 
 /**
- * Implementation of SettingsServices that persists Settings in SharedPreferences.
+ * Implementation of SettingsServices that persists AppSettings in SharedPreferences.
  */
 class SharedPreferencesSettingsServices(context: Context): SettingsServices {
 
     private var sharedPrefs = context.getSharedPreferences("settings", 0)
 
-    override fun saveSettings(settings: Settings) {
-        val json = GsonBuilder().create().toJson(settings)
+    override fun saveSettings(appSettings: AppSettings) {
+        val json = GsonBuilder().create().toJson(appSettings)
         val prefsEditor = sharedPrefs.edit()
         prefsEditor.putString("savedSettings", json)
         prefsEditor.apply()
     }
 
-    override fun getSettings(): Settings {
+    override fun getSettings(): AppSettings {
         val json = sharedPrefs.getString("savedSettings", "{ \"trackingChannel\":\"tracking\" }")
-        return GsonBuilder().create().fromJson(json, Settings::class.java)
+        return GsonBuilder().create().fromJson(json, AppSettings::class.java)
     }
 
     override fun saveLastUsedVersionCode(code: Int) {

@@ -1,15 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <EditText android:id="@+id/edit_text"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="20dp"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp"
-    android:inputType="textFilter"/>
+    <data>
 
-</LinearLayout>
+        <variable
+            name="viewModel"
+            type="com.movsoft.aptracker.scenes.add_item.AddTrackedItemViewModel" />
+
+        <variable
+            name="handler"
+            type="com.movsoft.aptracker.scenes.add_item.AddTrackedItemActionHandler" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/name_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:text="@={viewModel.nameText}"
+                app:on_editor_action_listener="@{handler}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/channel_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/tracking_channel_optional"
+                android:singleLine="true"
+                android:text="@={viewModel.trackingChannelText}"
+                app:on_editor_action_listener="@{handler}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/tracking_style"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/tracking_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:onCheckedChanged="@{ handler::onTrackingToggleChanged }"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/tracking_style_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/toggle" />
+
+            <RadioButton
+                android:id="@+id/tracking_style_single"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="@string/single" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+</layout>
