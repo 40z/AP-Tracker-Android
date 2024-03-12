@@ -5,11 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.databinding.DataBindingUtil
-import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivitySettingsBinding
 import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
-import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
  * Handles view actions.
@@ -42,11 +39,12 @@ class SettingsActivity: APTrackerBaseActivity(), SettingsActionHandler {
         viewModel = viewModelProvider.get(SettingsViewModel::class.java)
         viewModel.refresh()
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         binding.handler = this
         binding.viewModel = viewModel
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (viewModel.userNameText.isNullOrEmpty()) {

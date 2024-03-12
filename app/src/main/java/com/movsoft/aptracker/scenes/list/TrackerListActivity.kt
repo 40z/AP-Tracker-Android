@@ -25,7 +25,6 @@ import com.movsoft.aptracker.scenes.base.ViewModelState.Placeholder
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.SettingsNotValid
 import com.movsoft.aptracker.scenes.focus.FocusActivity
 import com.movsoft.aptracker.scenes.settings.SettingsActivity
-import kotlinx.android.synthetic.main.activity_main.*
 
 interface TrackerListActionHandler {
     fun onSettingsTapped()
@@ -46,8 +45,9 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         viewModel = viewModelProvider.get(TrackerListViewModel::class.java)
         viewModel.listener = this

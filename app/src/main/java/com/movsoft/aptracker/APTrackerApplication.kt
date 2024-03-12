@@ -37,14 +37,14 @@ class APTrackerApplication: Application() {
         }
 
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return when (modelClass) {
                 SettingsViewModel::class.java -> SettingsViewModel(settingsServices) as T
                 TrackerListViewModel::class.java -> TrackerListViewModel(trackingServices, trackedItemServices, settingsServices) as T
                 FocusViewModel::class.java -> FocusViewModel(trackedItemServices, trackingServices) as T
                 AddTrackedItemViewModelImpl::class.java -> AddTrackedItemViewModelImpl(application, trackedItemServices) as T
                 EditTrackedItemViewModel::class.java -> EditTrackedItemViewModel(application, trackedItemServices) as T
-                else -> modelClass.newInstance()
+                else -> modelClass.getDeclaredConstructor().newInstance()
             }
         }
     }

@@ -8,7 +8,6 @@ import com.movsoft.aptracker.BuildConfig
 import com.movsoft.aptracker.models.TrackItemResult
 import com.movsoft.aptracker.models.TrackItemResult.Status.*
 import com.movsoft.aptracker.models.TrackedItem
-import com.movsoft.aptracker.models.TrackedItemSettings
 import com.movsoft.aptracker.scenes.base.ViewModelState
 import com.movsoft.aptracker.scenes.base.ViewModelState.*
 import com.movsoft.aptracker.scenes.base.ViewModelStatePlaceholder.NoContent

@@ -3,12 +3,9 @@ package com.movsoft.aptracker.scenes.focus
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.databinding.DataBindingUtil
 import com.google.android.material.snackbar.Snackbar
-import com.movsoft.aptracker.R
 import com.movsoft.aptracker.databinding.ActivityFocusBinding
 import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
-import kotlinx.android.synthetic.main.activity_main.*
 
 interface FocusActionHandler {
     fun onItemTapped()
@@ -38,13 +35,14 @@ class FocusActivity : APTrackerBaseActivity(), FocusViewModel.Listener, FocusAct
 
         viewModel = viewModelProvider.get(FocusViewModel::class.java)
         viewModel.listener = this
-        viewModel.refresh(intent.getStringExtra(EXTRA_ITEM_IDENTIFIER))
+        viewModel.refresh(intent.getStringExtra(EXTRA_ITEM_IDENTIFIER)!!)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_focus)
+        binding = ActivityFocusBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         binding.handler = this
         binding.viewModel = viewModel
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
