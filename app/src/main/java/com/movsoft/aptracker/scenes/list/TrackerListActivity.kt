@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -99,7 +100,7 @@ class TrackerListActivity : APTrackerBaseActivity(), TrackerListViewModel.Listen
 
     override fun showError(message: String) {
         val snackbar = Snackbar.make(binding.trackerList, message, Snackbar.LENGTH_LONG)
-        val redColor = resources.getColor(android.R.color.holo_red_dark)
+        val redColor = ContextCompat.getColor(this, android.R.color.holo_red_dark)
         snackbar.view.setBackgroundColor(redColor)
         snackbar.show()
     }

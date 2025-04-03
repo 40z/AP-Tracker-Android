@@ -1,5 +1,9 @@
 <changelog>
 
+    <release versionCode="10" versionName="v1.4.1" date="2025-04-02">
+        <new>Updating for Android 15. Yearly release needed to keep my developer account open.</new>
+    </release>
+
     <release versionCode="9" versionName="v1.4" date="2024-03-02">
         <new>Updating for Android 14. Needed to release an app update or Google was going to close my developer account.</new>
     </release>
