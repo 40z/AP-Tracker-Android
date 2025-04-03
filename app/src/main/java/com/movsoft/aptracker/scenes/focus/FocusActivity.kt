@@ -3,6 +3,7 @@ package com.movsoft.aptracker.scenes.focus
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.movsoft.aptracker.databinding.ActivityFocusBinding
 import com.movsoft.aptracker.scenes.base.APTrackerBaseActivity
@@ -64,7 +65,7 @@ class FocusActivity : APTrackerBaseActivity(), FocusViewModel.Listener, FocusAct
 
     override fun showError(message: String) {
         val snackbar = Snackbar.make(binding.content, message, Snackbar.LENGTH_LONG)
-        val redColor = resources.getColor(android.R.color.holo_red_dark)
+        val redColor = ContextCompat.getColor(this, android.R.color.holo_red_dark)
         snackbar.view.setBackgroundColor(redColor)
         snackbar.show()
     }
